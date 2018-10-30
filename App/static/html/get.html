@@ -1,0 +1,272 @@
+<div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination" id="ID_UL_Paging" style="margin-top: 2px;margin-bottom: 2px">
+
+        </ul>
+    </nav>
+</div>
+
+<div style="width:50%;margin-bottom:40px;margin-left: 25%">
+<!--<div style="text-align: center;margin-bottom:40px;">-->
+    <div class="col-lg-6">
+        <div class="input-group">
+
+            <div class="input-group-btn" >
+                <button type="button" id="ID_Button_Serch" class="btn btn-default dropdown-toggle"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">全部 <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" onclick="click_change_serch('all')">全部</a></li>
+                    <li><a href="#" onclick="click_change_serch('date')">按日期</a></li>
+                    <li><a href="#" onclick="click_change_serch('kpr')">按开票人</a></li>
+                    <li><a href="#" onclick="click_change_serch('siji')">按司机</a></li>
+                </ul>
+            </div><!-- /btn-group -->
+
+            <div >
+                <input id="ID_INPUT_Serch_Val" type="text" class="form-control"  aria-label="...">
+            </div>
+
+            <div class="input-group-btn" >
+                <button  id="ID_Button_Search_Submit" onclick="get_data(1)" type="button" class="btn btn-primary" >查询</button>
+            </div>
+
+        </div><!-- /input-group -->
+
+    </div><!-- /.col-lg-6 -->
+
+</div><!-- /.row -->
+
+<div>
+<table id="ID_Tab_Data" class="table table-hover jumbotron " style="width: 1000px;">
+
+</table>
+</div>
+<div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width:900px">
+		<div class="modal-content" style="width:850px">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					&times;
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					标题
+				</h4>
+			</div>
+			<div class="modal-body">
+				<table id="ID_Tab_Data" class="table table-hover jumbotron " >
+                    <tr>
+                        <th>日期</th>
+                        <th>目的地</th>
+                        <th>司机</th>
+                        <th>开票人</th>
+                        <th>单位(t)</th>
+                        <th>价格</th>
+                        <th>备注</th>
+                    </tr>
+                    <tr>
+                        <td><input type="text" style="width:100px" placeholder="日期" id="ID_INPUT_date"></td>
+                        <td><input type="text" style="width:100px" placeholder="目的地" id="ID_INPUT_Destination"></td>
+                        <td><input type="text" style="width:100px" placeholder="司机" id="ID_INPUT_SiJi"></td>
+                        <td><input type="text" style="width:100px" placeholder="开票人" id="ID_INPUT_KPR"></td>
+                        <td><input type="text" style="width:100px" placeholder="单位(t)" id="ID_INPUT_T"></td>
+                        <td><input type="text" style="width:100px" placeholder="价格" id="ID_INPUT_Price"></td>
+                        <td><input type="text" style="width:100px" placeholder="备注" id="ID_INPUT_Notes"></td>
+                    </tr>
+                </table>
+                <input id="ID_INPUT_Id" style="display: none">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="click_update_submit()">提交</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal -->
+</div>
+</div>
+
+<script>
+    var SELECT_OPTION = "all";
+
+
+    var CURRENT_INDEX = 1;
+
+    function click_change_serch(param) {
+        var searchVal = "";
+
+        switch (param) {
+
+            case "all":
+                SELECT_OPTION = "all";
+                searchVal = "全部";
+
+                break;
+            case "kpr":
+                SELECT_OPTION = "kpr";
+                searchVal = "开票人";
+
+                break;
+            case "siji":
+                SELECT_OPTION = "siji";
+                searchVal = "司机";
+
+                break;
+            case "date":
+                SELECT_OPTION = "date";
+                searchVal = "日期";
+
+                break;
+        }
+        $("#ID_Button_Serch").html(searchVal);
+        $("#ID_INPUT_Serch_Val").val("");
+    }
+
+    function click_update_data(index){
+
+        $("#ID_INPUT_Id").val($("#ID_TD_Id_"+index).html());
+        $("#ID_INPUT_date").val($("#ID_TD_Date_"+index).html());
+        $("#ID_INPUT_Destination").val($("#ID_TD_Destination_"+index).html() );
+        $("#ID_INPUT_SiJi").val( $("#ID_TD_SiJi_"+index).html());
+        $("#ID_INPUT_KPR").val( $("#ID_TD_KPR_"+index).html());
+        $("#ID_INPUT_T").val($("#ID_TD_T_"+index).html() );
+        $("#ID_INPUT_Price").val($("#ID_TD_Price_"+index).html() );
+        $("#ID_INPUT_Notes").val( $("#ID_TD_Notes_"+index).html());
+
+    }
+
+    function click_update_submit() {
+         var dataArr = [{
+                "id":$("#ID_INPUT_Id").val(),
+                "date":$("#ID_INPUT_date").val(),
+                "destination":$("#ID_INPUT_Destination").val(),
+                "si_ji":$("#ID_INPUT_SiJi").val(),
+                "kai_piao_ren":$("#ID_INPUT_KPR").val(),
+                "t":$("#ID_INPUT_T").val(),
+                "price":$("#ID_INPUT_Price").val(),
+                "notes":$("#ID_INPUT_Notes").val(),
+            },]
+
+
+        $.ajax({
+            type: "PUT",
+            url: "/cement/",
+            data: JSON.stringify({"data": dataArr}),
+            success: function (result) {
+                if(result.code == 1){
+                    get_data(CURRENT_INDEX);
+                }
+                alert(result.msg);
+
+            }
+        });
+    }
+
+    function click_delete_data(id) {
+
+        var data = [
+            {"id": id,},
+        ]
+
+        $.ajax({
+            type: "DELETE",
+            url: "/cement/",
+            data: JSON.stringify({"data": data}),
+            success: function (result) {
+                alert(result.msg);
+                get_data(CURRENT_INDEX);
+            }
+        });
+    }
+
+
+    function get_data(index) {
+
+        var append_tab = function (result) {
+
+            var data = result.data;
+
+            var page_index = result.page_index;
+
+            CURRENT_INDEX = page_index;
+
+            var page_nums = result.page_nums;
+
+            var has_prev = result.has_prev;
+
+            var has_next = result.has_next;
+
+            var str = "<tr><th>ID</th><th>日期</th><th>目的地</th><th>司机</th><th>开票人</th><th>单位(t)</th><th>价格</th><th>备注</th><th>编辑</th></tr>";
+            for (var index = 0; index < data.length; index++) {
+                str += "<tr>"
+                    + "<td id='ID_TD_Id_"+index+"'>" + data[index].id + "</td>"
+                    + "<td id='ID_TD_Date_"+index+"'>" + data[index].date + "</td>"
+                    + "<td id='ID_TD_Destination_"+index+"'>" + data[index].destination + "</td>"
+                    + "<td id='ID_TD_SiJi_"+index+"'>" + data[index].si_ji + "</td>"
+                    + "<td id='ID_TD_KPR_" + index + "'>" + data[index].kai_piao_ren + "</td>"
+                    + "<td id='ID_TD_T_" + index + "'>" + data[index].t + "</td>"
+                    + "<td id='ID_TD_Price_" + index + "'>" + data[index].price + "</td>"
+                    + "<td id='ID_TD_Notes_" + index + "'>" + data[index].notes + "</td>"
+                    + "<td>"
+                    + "<button class=\"btn btn-default\" data-toggle=\"modal\" data-target=\"#myModal\" onclick='click_update_data(" + index + ")' >编辑</button>&nbsp;&nbsp;&nbsp;&nbsp;"
+                    + "<button class=\"btn btn-default\" onclick='click_delete_data(" + data[index].id + ")'>删除</button>"
+                    + "</td>"
+                    + "</tr>";
+            }
+
+            $("#ID_Tab_Data").html(str);
+
+            var pagingStr = "";
+
+            if (has_prev) {
+                pagingStr += '<li onclick="get_data(' + (page_index - 1) + ')" ><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>';
+            } else {
+                pagingStr += '<li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>';
+            }
+
+            for (var i = 1; i <= page_nums; i++) {
+                if (i == page_index) {
+                    pagingStr += '<li class="active"><a href="#">' + i + '</a></li>';
+                } else {
+                    pagingStr += '<li onclick="get_data(' + i + ')" ><a href="#" >' + i + '</a></li>';
+                }
+            }
+
+            if (has_next) {
+                pagingStr += '<li  onclick="get_data(' + (page_index + 1) + ')" ><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>';
+            } else {
+                pagingStr += '<li class="disabled" ><a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>';
+            }
+
+            $("#ID_UL_Paging").html(pagingStr);
+        }
+
+        var param = $("#ID_INPUT_Serch_Val").val();
+
+        var data = {
+            "cmd": SELECT_OPTION,
+            "page_nu": index,
+        }
+
+        data[SELECT_OPTION] = param;
+
+        $.ajax({
+            type: "GET",
+            url: "/cement/",
+            data: data,
+            success: function (result) {
+                if(result.code == 1){
+                    append_tab(result);
+                }else{
+                    alert(result.msg)
+                }
+
+            }
+        });
+    }
+
+    get_data(CURRENT_INDEX);
+
+</script>

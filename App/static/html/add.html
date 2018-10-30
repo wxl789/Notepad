@@ -1,0 +1,104 @@
+<table id="ID_Tab_Data" class="table table-hover jumbotron " style="width: 1000px;">
+    <tr id = "ID_Tr_AddTr_0">
+        <th>日期</th>
+        <th>目的地</th>
+        <th>司机</th>
+        <th>开票人</th>
+        <th>单位(t)</th>
+        <th>价格</th>
+        <th>备注</th>
+    </tr>
+</table>
+<button id = "ID_Button_Add_Submit" type="button" class="btn btn-success">提交</button>
+<button id = "ID_Button_add" type="button" class="btn btn-info">添加</button>
+
+
+<script>
+    var TRINDEX = 1;
+
+    var DelElementIndex = new Array();
+
+    function add_data() {
+        var check_in_arr = function (arr,val) {
+            for(var index = 0;index < arr.length; index++){
+                if(val == arr[index]){
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+
+        var dataArr = [];
+
+        for(var i = 1; i < TRINDEX ; i++){
+
+            if(check_in_arr(DelElementIndex,i) > 0){
+                continue;
+            }
+
+            var date = $("#ID_INPUT_Date_"+i).val();
+            var destination = $("#ID_INPUT_Distination_"+i).val();
+            var siji = $("#ID_INPUT_Siji_"+i).val();
+            var kaipiaoren = $("#ID_INPUT_KPR_"+i).val();
+            var t = $("#ID_INPUT_T_"+i).val();
+            var price = $("#ID_INPUT_Price_"+i).val();
+            var notes = $("#ID_INPUT_Notes_"+i).val();
+
+            var dataDict = {
+                "date":date,
+                "destination":destination,
+                "si_ji":siji,
+                "kai_piao_ren":kaipiaoren,
+                "t":t,
+                "price":price,
+                "notes":notes,
+            };
+
+            dataArr.push(dataDict);
+
+        }
+
+         $.ajax({
+            type: "POST",
+            url: "/cement/",
+            data: JSON.stringify({"data": dataArr}),
+            dataType:"json",
+            headers: { "Content-Type": "application/json;charset=utf-8" },
+            contentType:'application/json; charset=utf-8',
+            success: function (res) {
+               alert(res.msg)
+            }
+        });
+    }
+
+    function click_del(index) {
+
+        $("#ID_Tr_AddTr_"+index).remove();
+
+        DelElementIndex.push(index);
+
+    }
+
+    function click_add() {
+        var add_content = '<tr id="ID_Tr_AddTr_'+TRINDEX+'">'
+            + '<td><input id="ID_INPUT_Date_'+TRINDEX+'" type="text" class="form-control" placeholder="日期"></td>'
+            + '<td><input id="ID_INPUT_Distination_'+TRINDEX+'"  type="text" class="form-control" placeholder="目的地"></td>'
+            + '<td><input id="ID_INPUT_Siji_'+TRINDEX+'" type="text" class="form-control" placeholder="司机"></td>'
+            + '<td><input id="ID_INPUT_KPR_'+TRINDEX+'" type="text" class="form-control" placeholder="开票人"></td>'
+            + '<td><input id="ID_INPUT_T_'+TRINDEX+'" type="text" class="form-control" placeholder="t"></td>'
+            + '<td><input id="ID_INPUT_Price_'+TRINDEX+'" type="text" class="form-control" placeholder="价格"></td>'
+            + '<td colspan="2"><input id="ID_INPUT_Notes_'+TRINDEX+'" type="text" class="form-control" placeholder="备注"></td>'
+            + '<td><button type="button" class="btn btn-warning" onclick="click_del(\''+TRINDEX+'\')">删除</button></td>'
+            + '</tr>';
+
+        $("#ID_Tr_AddTr_0").after(add_content);
+
+        TRINDEX++ ;
+    }
+
+    $("#ID_Button_add").click(click_add);
+
+    $("#ID_Button_Add_Submit").click(add_data);
+
+</script>
