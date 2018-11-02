@@ -1,10 +1,12 @@
-from flask import Blueprint, request, render_template, redirect, url_for, flash
-from flask_login import login_user, logout_user
+from flask import Blueprint, request, render_template, redirect, url_for, flash, json
+from flask.json import jsonify
+from flask_login import login_user, logout_user, current_user
 
 from App.exp import login_manager
 from App.models.user_model import User
 
 bp = Blueprint('loginBP', __name__)
+
 
 @login_manager.user_loader
 def loader_user(id):
@@ -13,6 +15,8 @@ def loader_user(id):
     :param id:
     :return:
     '''
+    print ('loader_user')
+    print (id)
 
     try:
         user = User.query.get(id)
@@ -22,54 +26,58 @@ def loader_user(id):
     return user
 
 
-@login_manager.request_loader
-def request_loader(request):
-    '''
-    请求加载回调函数
-    :return:
-    '''
-    name = request.form.get('username')
-
-    try:
-        user = User.query.filter(User.username == name).first()
-    except:
-        return None
-
-    # DO NOT ever store passwords in plaintext and always compare password
-    # 这里应该使用hansh进行密码验证
-    if user:
-        user.is_authenticated = request.form.get('password') == user.password
-
-    return user
-
-
 @bp.route('/')
 @bp.route('/login/', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
+        if( current_user.is_authenticated):
+            return redirect(url_for("indexBP.index"))
 
         return render_template('login.html')
 
-    name = request.form.get('username')
+    try:
+        results = request.get_data()
+
+        results = json.loads(results)
+
+        datas = results.get("data")
+    except:
+        return {
+            "code": 0,
+            "msg": "数据不是json标准格式,或入参没有data关键字",
+            "data": "",
+        }
+
+    name = datas.get("username")
+    pwd = datas.get("password")
+
 
     try:
         user = User.query.filter(User.username == name).first()
 
-        if user.password == request.form.get('password'):
+        if user.verify_password(pwd):
             login_user(user, remember=True, fresh=False)
 
-            return redirect(url_for("indexBP.index"))
+            res = {
+                "code": 1,
+                "msg": "登录成功",
+                "data": "/index",
+            }
         else:
-            '''
-                需要添加错误提示
-            '''
-            flash("用户名或者密码错误")
-            return ""
+            res = {
+                "code": 0,
+                "msg": "用户名或者密码错误",
+                "data": "",
+            }
 
     except:
-        flash("用户名或者密码错误")
+        res = {
+            "code": 0,
+            "msg": "用户名或者密码错误",
+            "data": "",
+        }
 
-        return ""
+    return jsonify(res)
 
 
 @bp.route('/logout/')
@@ -79,6 +87,7 @@ def logout():
     :return:
     '''
     logout_user()
+
     return redirect(url_for("loginBP.login"))
 
 
@@ -88,6 +97,4 @@ def unauthorized_handler():
         未登录就访问login_required修饰的路由则会调用此函数
     :return:
     '''
-    flash ("需要登录验证才能访问")
     return redirect(url_for("loginBP.login"))
-

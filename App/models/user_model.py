@@ -1,13 +1,10 @@
 from flask_login import UserMixin
 from flask_wtf import FlaskForm as Form
+from werkzeug.security import check_password_hash, generate_password_hash
 from  wtforms import  StringField,PasswordField
 from wtforms.validators import DataRequired
 
 from App.exp import db
-
-class LoginForm(Form):
-    accountNumber = StringField('accountNumber',validators=[DataRequired('accountNumber is null')])
-    password = PasswordField('password', validators=[DataRequired('password is null')])
 
 class User(db.Model,UserMixin):
 
@@ -24,21 +21,31 @@ class User(db.Model,UserMixin):
         nullable=False,
     )
 
-    email = db.Column(
-        db.String(120),
+    phone = db.Column(
+        db.String(13),
+        unique=True,
     )
 
-    password = db.Column(
-        db.String(32),
+    email = db.Column(
+        db.String(120),
+        unique=True,
+    )
+
+    password_hash = db.Column(
+        db.String(256),
         nullable=False,
     )
 
-    avatar_hash = db.Column(
-        db.String(32)
-    )
+    @property
+    def password(self):
+        return AttributeError('password is not a readable attribute')
 
-    def checkUser(self,name,pwd):
-        if self.username == name and self.password == pwd:
+    @password.setter
+    def password(self,password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self,pwd):
+        if check_password_hash(self.password_hash,pwd) :
             return True
         else:
             return False

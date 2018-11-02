@@ -15,9 +15,9 @@ DATABASE = {
 
     "DRIVER": "pymysql",
 
-    "USER": os.getenv("DB_USER"),
+    "USER": os.getenv("DB_USERNAME"),
 
-    "PASSWORD": os.getenv("DB_PWD"),
+    "PASSWORD": os.getenv("DB_PASSWORD"),
 
     "DOMAIN": "127.0.0.1",
 

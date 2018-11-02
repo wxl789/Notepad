@@ -24,4 +24,7 @@ pyexcel-xls
 pyexcel-xlsx
 
 pymysql
+
+flask-login
+werkzeug
 ```
