@@ -2,16 +2,16 @@ import flask_excel as excel
 
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from flask_session import Session
+# from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 
 # Flask-SQLAlchemy插件
-# Flask_Migrate 插件
-
 db = SQLAlchemy()
 
+# Flask_Migrate 插件
 migrate = Migrate()
 
+#Flask_Login
 login_manager = LoginManager()
 
 
@@ -23,7 +23,7 @@ def init_exp(app):
     '''
 
     # flask-session插件
-    Session(app=app)
+    # Session(app=app)
 
     # flask-SQLAlchemy插件初始化
     db.init_app(app=app)
@@ -35,9 +35,6 @@ def init_exp(app):
     excel.init_excel(app)
 
     #flask-login 插件初始化.
-    # login_manager.session_protection = "strong"
-    # login_manager.login_view = "loginBP.login"
-    # login_manager.login_message = "请登录"
     login_manager.init_app(app=app)
 
     return None
