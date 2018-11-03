@@ -15,8 +15,6 @@ def loader_user(id):
     :param id:
     :return:
     '''
-    print ('loader_user')
-    print (id)
 
     try:
         user = User.query.get(id)
@@ -42,11 +40,11 @@ def login():
 
         datas = results.get("data")
     except:
-        return {
+        return jsonify({
             "code": 0,
             "msg": "数据不是json标准格式,或入参没有data关键字",
             "data": "",
-        }
+        })
 
     name = datas.get("username")
     pwd = datas.get("password")
@@ -98,3 +96,66 @@ def unauthorized_handler():
     :return:
     '''
     return redirect(url_for("loginBP.login"))
+
+
+@bp.route("/update_pwd/",methods = ["GET","POST"])
+def update_password():
+    '''
+
+    :return:
+    '''
+    try:
+        results = request.get_data()
+
+        results = json.loads(results)
+
+        datas = results.get("data")
+    except:
+        return jsonify({
+            "code": 0,
+            "msg": "数据不是json标准格式,或入参没有data关键字",
+            "data": "",
+        })
+
+    oldpwd = datas.get("oldpassword")
+    newpwd = datas.get("newpassword")
+    confirmpwd = datas.get("confirmpassword")
+
+    if current_user.verify_password(oldpwd):
+
+        if newpwd == confirmpwd:
+
+            current_user.password = newpwd
+
+            res = {
+                "code":1,
+                "msg":"密码更新成功,请重新登录",
+                "data":"/logout/",
+            }
+        else:
+            res = {
+                "code":2,
+                "msg":"新密码两次输入不相同",
+                "data":"",
+            }
+
+    else:
+        res = {
+            "code":0,
+            "msg":"用户密码输入错误",
+            "data":"",
+        }
+
+    return jsonify(res)
+
+
+@bp.route("/getuser/")
+def get_current_username():
+    res = {
+        "code": 1,
+        "msg": "",
+        "data": current_user.username,
+    }
+
+    return jsonify(res)
+

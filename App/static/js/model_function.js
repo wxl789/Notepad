@@ -16,6 +16,7 @@ function change_class(ID) {
 function backup_data(cmd) {
 
 }
+
 //把button和页面进行绑定,点击不同的button显示不同的页面
 function bind_content_page(ID) {
 
@@ -39,9 +40,9 @@ function bind_content_page(ID) {
 
             page = "add";
 
-        } else if (param[1] == "Change") {
+        } else if (param[1] == "Update") {
 
-            page = "change";
+            page = "updatepwd";
 
         }
 
@@ -62,16 +63,7 @@ $(document).ready(function () {
     bind_content_page("ID_Add");
     bind_content_page("ID_Get");
     bind_content_page("ID_Backup");
-    bind_content_page("ID_Change_Password");
-
-    // bind_content_page("ID_Get_KaiPiaoRen");
-    // bind_content_page("ID_Get_SiJi");
-    // bind_content_page("ID_Get_RiQi");
-    // bind_content_page("ID_Get_All");
-    //
-    // bind_content_page("ID_Backup_Current");
-    // bind_content_page("ID_Backup_SiJi");
-    // bind_content_page("ID_Backup_KaiPiaoRen");
+    bind_content_page("ID_Update_pwd");
 
 
     //选中样式切换
@@ -84,4 +76,13 @@ $(document).ready(function () {
     //第一次进入首页的时候加载home页面的内容
     $("#content").load(BASICDIR + "home.html");
 
+    $.ajax({
+        type: "GET",
+        url: "/getuser/",
+        success: function (res) {
+            if (res.code == 1) {
+                $("#ID_LI_Username").html(res.data)
+            }
+        }
+    });
 });

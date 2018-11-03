@@ -1,0 +1,73 @@
+<div>
+    <div class="panel panel-primary " style="width: 350px;margin-top: 50px;">
+        <div class="panel-heading">
+            <h2 class="panel-title">
+                修改密码
+            </h2>
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <input type="password" name="oldpassword" class="form-control" id="oldpassword" placeholder="请输入旧密码">
+            </div>
+            <div class="form-group">
+                <input type="password" name="newpassword" class="form-control" id="newpassword" placeholder="请输入新密码">
+            </div>
+            <div class="form-group">
+                <input type="password" name="confirmpassword" class="form-control" id="confirmpassword"
+                       placeholder="确认新密码">
+            </div>
+
+            <button type="submit" id="ID_Button_Submit" onclick="click_updatepwd()" class="btn btn-default">确认</button>
+        </div>
+    </div>
+</div>
+
+<!--
+<div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">请输入旧密码</label>
+        <input type="password" name="oldpassword" class="form-control" id="oldpassword" placeholder="请输入旧密码">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">请输入新密码</label>
+        <input type="password" name="newpassword" class="form-control" id="newpassword" placeholder="请输入新密码">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">请确认密码</label>
+        <input type="password" name="confirmpassword" class="form-control" id="confirmpassword" placeholder="确认新密码">
+    </div>
+
+    <button type="submit" id="ID_Button_Submit" onclick="click_updatepwd()" class="btn btn-default">确认</button>
+
+</div>
+-->
+<script>
+    function click_updatepwd() {
+        oldpwd = $("#oldpassword").val();
+        newpwd = $("#newpassword").val();
+        confirmpwd = $("#confirmpassword").val();
+        res = {
+            "oldpassword": oldpwd,
+            "newpassword": newpwd,
+            "confirmpassword": confirmpwd,
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/update_pwd/",
+            data: JSON.stringify({"data": res}),
+            dataType: "json",
+            headers: {"Content-Type": "application/json;charset=utf-8"},
+            contentType: 'application/json; charset=utf-8',
+            success: function (res) {
+                alert(res.msg);
+                if (res.code == 1) {
+                    window.location.href = res.data;
+                }
+
+
+            }
+        });
+
+    }
+</script>

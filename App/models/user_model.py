@@ -1,8 +1,5 @@
 from flask_login import UserMixin
-from flask_wtf import FlaskForm as Form
 from werkzeug.security import check_password_hash, generate_password_hash
-from  wtforms import  StringField,PasswordField
-from wtforms.validators import DataRequired
 
 from App.exp import db
 
@@ -43,12 +40,16 @@ class User(db.Model,UserMixin):
     @password.setter
     def password(self,password):
         self.password_hash = generate_password_hash(password)
+        db.session.add(self)
+        db.session.commit()
+        return None
 
     def verify_password(self,pwd):
         if check_password_hash(self.password_hash,pwd) :
             return True
         else:
             return False
+
 
     def __repr__(self):
         return '<User %s>' % self.username
